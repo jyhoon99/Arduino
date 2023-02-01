@@ -3,6 +3,9 @@
 
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/String.h>
+#include <std_msgs/UInt8.h>
+#include <std_msgs/Int8.h>
 
 #include <DynamixelWorkbench.h>
 
@@ -16,14 +19,15 @@ DynamixelWorkbench dxl_wb;
 ros::NodeHandle nh;
 
 
-   ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", &MsgCB );
+   
 
-   std_msgs::String str_msg[];
+   std_msgs::String str_msg;
    std_msgs::UInt8 uint_msg;      //uint8
    std_msgs::Int8 int_msg;        //int8
-   
    ros::Publisher pub("topic", &str_msg);
-   nh.advertise(pub);
+
+   
+
 
 void MsgCB(const geometry_msgs::Twist& msg){
 //   ROS_INFO("receive: [%lf]", msg.linear.x);
@@ -40,22 +44,25 @@ void MsgCB(const geometry_msgs::Twist& msg){
    const uint8_t handler_index = 0;             //syncWrite_param_index
    int32_t goal_speed[2] = {0, 1023};           //syncWrite_param_*data
 
+      ros::Publisher pub("topic", &str_msg);
+
+
    //init
   result = dxl_wb.init(DEVICE_NAME, BAUDRATE, &log);
   if (result == false)
   {    
     //Serial.println(log);
     //Serial.println("Failed to init");
-    str_msg.data[1] = log;
-    str_msg.data[2] = "Failed to init";
+    str_msg.data = log;
+    str_msg.data = "Failed to init";
     pub.publish( &str_msg );
   }
   else
   {
 //    Serial.print("Succeeded to init : ");
 //    Serial.println(BAUDRATE);  
-    str_msg.data[1] = "Succeeded to init";
-    str_msg.data[2]= BAUDRATE;
+    str_msg.data = "Succeeded to init";
+//    str_msg.data= BAUDRATE; //convert string 2 int
     pub.publish( &str_msg );
   }
 
@@ -69,8 +76,8 @@ void MsgCB(const geometry_msgs::Twist& msg){
     {
 //      Serial.println(log);
 //      Serial.println("Failed to ping");
-      str_msg.data[1] = log;
-      str_msg.data[2] = "Failed to ping";
+      str_msg.data = log;
+      str_msg.data = "Failed to ping";
       pub.publish( &str_msg );
     }
     else
@@ -81,10 +88,10 @@ void MsgCB(const geometry_msgs::Twist& msg){
 //      Serial.print(" model_number : ");
 //      Serial.println(model_number);
 //      str_msg.data3 = "Succeeded to ping";
-      str_msg.data[1] = "id : "    
-      str_msg.data[2] = (dxl_id[cnt]);
-      str_msg.data[3] = " model_number : ");
-      str_msg.data[4] = (model_number);    
+      str_msg.data = "id : ";    
+//      str_msg.data = (dxl_id[cnt]);   //convert string 2 int
+      str_msg.data = " model_number : ";
+//      str_msg.data = (model_number);    //convert string 2 uint
       pub.publish( &str_msg );
     }
 
@@ -94,8 +101,8 @@ void MsgCB(const geometry_msgs::Twist& msg){
   {
 //    Serial.println(log);
 //    Serial.println("Failed to change wheel mode");
-    str_msg.data[1] = log;
-    str_msg.data[2] = :"Failed to change wheel mode");
+    str_msg.data = log;
+    str_msg.data = "Failed to change wheel mode";
     pub.publish( &str_msg );
   }
   else
@@ -107,8 +114,8 @@ void MsgCB(const geometry_msgs::Twist& msg){
       dxl_wb.goalVelocity(dxl_id[cnt], int(lin_vel_step));           //mode1 or mode3
       delay(3000);
 
-      str_msg.data[1] = ("Succeed to change wgeel mode");
-      str_msg.data[2] = ("Dynamixel is moving...");
+      str_msg.data  = ("Succeed to change wgeel mode");
+      str_msg.data  = ("Dynamixel is moving...");
       //uint8, int data 
            
       pub.publish( &str_msg );
@@ -123,8 +130,8 @@ void MsgCB(const geometry_msgs::Twist& msg){
   {
 //    Serial.println(log);
 //    Serial.println("Failed to add sync write handler");
-    str_msg.data[1] = log;
-    str_msg.data[2] = "Failed to add sync write handler");
+    str_msg.data = log;
+    str_msg.data = "Failed to add sync write handler";
     pub.publish( &str_msg );
 
   }
@@ -134,12 +141,14 @@ void MsgCB(const geometry_msgs::Twist& msg){
   {
 //    Serial.println(log);
 //    Serial.println("Failed to sync write speed");
-    str_msg.data[1] = log;
-    str_msg.data[2] = "Failed to sync write speed");
+      str_msg.data = log;
+      str_msg.data = "Failed to sync write speed";
     pub.publish( &str_msg );
 
   }  
 }
+
+ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", &MsgCB );
 
 void setup() {
   // DynamixelWrokbench
