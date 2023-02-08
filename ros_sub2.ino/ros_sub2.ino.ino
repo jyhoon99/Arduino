@@ -18,7 +18,7 @@ ros::NodeHandle nh;
 
 void MsgCB(const geometry_msgs::Twist& msg){
 //   ROS_INFO("receive: [%lf]", msg.linear.x);
-//   ROS_INFO("receive: [%lf]", msg.angular.z);
+// ROS_INFO("receive: [%lf]", msg.angular.z);
 
    const char *log;
    bool result = false;
