@@ -26,7 +26,7 @@
 
 #define BAUDRATE  115200
 #define DXL_ID_1  3
-#define DXL_ID_2  4
+#define DXL_ID_2  5
 
 DynamixelWorkbench dxl_wb;
 
@@ -57,7 +57,7 @@ void setup()
     Serial.println(BAUDRATE);  
   }
 
-  for (int cnt = 3; cnt < 5; cnt++)
+  for (int cnt = 0; cnt < 3; cnt++)
   {
     result = dxl_wb.ping(dxl_id[cnt], &model_number, &log);
     if (result == false)
@@ -92,13 +92,6 @@ void setup()
     Serial.println(log);
     Serial.println("Failed to add sync write handler");
   }
-
-  result = dxl_wb.addSyncReadHandler(dxl_id[0], "Present_Position", &log);
-  if (result == false)
-  {
-    Serial.println(log);
-    Serial.println("Failed to add sync read handler");
-  }
 }
 
 void loop() 
@@ -122,31 +115,7 @@ void loop()
     {
       Serial.println(log);
       Serial.println("Failed to sync read position");
-    }
-
-    result = dxl_wb.getSyncReadData(handler_index, &present_position[0], &log);
-    if (result == false)
-    {
-      Serial.println(log);
-    }
-    else
-    {
-      Serial.print("[ID ");
-      Serial.print(dxl_id[0]);
-      Serial.print(" ]");
-      Serial.print(" Goal Position : ");
-      Serial.print(goal_position[0]);
-      Serial.print(" Present Position : ");
-      Serial.print(present_position[0]);
-      Serial.print(" [ID ");
-      Serial.print(dxl_id[1]);
-      Serial.print(" ]");
-      Serial.print(" Goal Position : ");
-      Serial.print(goal_position[1]);
-      Serial.print(" Present Position : ");
-      Serial.println(present_position[1]);
-    }
-
+    }    
   }while(abs(goal_position[0] - present_position[0]) > 15 && 
         abs(goal_position[1] - present_position[1]) > 15);
 
